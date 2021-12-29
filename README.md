@@ -32,6 +32,13 @@ by Daniel Gaspar, Jack Stouffer
 - managed with sqlalchemy ORM - abstracted further by flask-sqlalchemy package (makes some commands less verbose)
 - database uri == connection string (varies by db type)
   - includes uswername and PW (caution)
+- [datatypes](https://docs.sqlalchemy.org/en/14/core/type_basics.html) - support varies by bakcing DB (e.g. sqlite has no date types - just string)
+  - String, Integer, and Float types take an extra argument for length limit
+  - String/Text - both translate to varchar? ❓ no, Text usually becomes CLOB; string becomes varchar
+  - Integer
+  - Float
+  - Boolean - becomes 0 or 1 if db has no boolean type
+  - Date/DateTime/Time
 - operations
   - create - assign model object instance to var and use `db.session.add(instance)` and `db.session.commit()`
   - read - `<parentclass>.qeury` e.g. for User table it would be `res = User.query.all()` - subcommends
@@ -43,11 +50,11 @@ by Daniel Gaspar, Jack Stouffer
     - limit(n) - return top n rows
     - first() - return top 1 row
     - get() - retrieve by primary key
-  - update - 
-  - delete - 
+  - update - `<query result>.update({dict_of:'new_values'})` ... **then commit**
+  - delete - `res = <dbquery>` then `res.delete()` ... **then commit**
 - versions/migrations managed with alembic via flask-migrate
 - dependency types: one-one, one-many, many-many (requires implicit lookup table)
-  - lookup table extends db.Table (lower level than db.Model)
+  - lookup table extends db.Table (lower level than db.Model) 
 - <span style='color:red;font-weight:bold;'>NOTE</span> SQLite and MySQL/MyISAM engines do not enforce relationship constraints - by default - can be enabled but causes additional overhead
 - <span style='color:red;'>NOTE</span> migrate doesn't handle indexes - need to check logs to make sure indexes are updated as needed
 
