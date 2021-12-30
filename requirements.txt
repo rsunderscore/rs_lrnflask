@@ -1,0 +1,11 @@
+flask
+sqlalchemy
+flask-sqlalchemy
+# MySQL
+# PyMySQL
+# Postgres
+# psycopg2
+# MSSQL
+# pyodbc
+# Oracle
+# cx_Oracle
