@@ -1,6 +1,8 @@
 flask
 sqlalchemy
 flask-sqlalchemy
+flask-wtforms
+Flask-Migrate
 # MySQL
 # PyMySQL
 # Postgres

@@ -55,9 +55,30 @@ by Daniel Gaspar, Jack Stouffer
 - versions/migrations managed with alembic via flask-migrate
 - dependency types: one-one, one-many, many-many (requires implicit lookup table)
   - lookup table extends db.Table (lower level than db.Model) 
-- <span style='color:red;font-weight:bold;'>NOTE</span> SQLite and MySQL/MyISAM engines do not enforce relationship constraints - by default - can be enabled but causes additional overhead
-- <span style='color:red;'>NOTE</span> migrate doesn't handle indexes - need to check logs to make sure indexes are updated as needed
 
+- <span style='color:red;'>NOTE</span> migrate doesn't handle indexes - need to check logs to make sure indexes are updated as needed
+- gotchas
+    - render_pagination macro is called in the templates but never written out in the text
+    - in some places ORM uses explicit sql text (e.g. in order_by statement of get_sidebar_data) which is not valid in current implementation and must be explictly placed in `text()` method from sqlalchemy.sql module.
+    - <span style='color:red;font-weight:bold;'>NOTE</span> SQLite and MySQL/MyISAM engines do not enforce relationship constraints - by default - can be enabled but causes additional overhead
+    - sqlite doesn't support foreign key contraints by default - has to be turned on (performance hit)
+    ```python
+        ...
+        from sqlalchemy import func, event
+        from sqlalchemy.engine import Engine
+        ...
+        @event.listens_for(Engine, "connect")
+        def set_sqlite_pragma(dbapi_connection, connection_record):
+            cursor = dbapi_connection.cursor()
+            cursor.execute("PRAGMA foreign_keys=ON")
+            cursor.close()
+        
+    ```
+    - sqlite doesn't suport alter command for alembic migrations - solution is to alter env.py in the migrations folder.  This needs to be set for both online and offline mgiration sectiosn (2 places).
+        - if this was forgotten after running a migrate command go into the migrations/versions folder and delete the faulty migration py file. Then run migrate again.
+    ```python
+        context.configure(..., render_as_batch=True, ...)
+    ```
 ## Templates
 - managed with jinja package
 - code blockes are `{{ }}`
